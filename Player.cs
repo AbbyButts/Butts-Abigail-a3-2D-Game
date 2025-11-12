@@ -30,11 +30,11 @@ namespace MohawkGame2D
         {
 
         }
-        public void Update(Platform[] platforms)
+        public void Update(Platform[] platforms, HitBox[] hitBoxes)
         {
             DrawPlayer();
             SimulateGravity();
-            Collision(platforms);
+            Collision(platforms, hitBoxes);
             Movement();
         }
         public void DrawPlayer()
@@ -49,7 +49,7 @@ namespace MohawkGame2D
             //move player
             pos.Y += Velocity * Time.DeltaTime;
         }
-        public void Collision(Platform[] platforms)
+        public void Collision(Platform[] platforms, HitBox[] hitBoxes)
         {
             float playerTop = pos.Y;
             float playerBottom = pos.Y + size.Y;
@@ -62,20 +62,20 @@ namespace MohawkGame2D
                 pos.Y = 0;
                 Velocity = 0f;
             }
-
             if (playerBottom >= 600)
             {
                 pos.Y = 600 - size.Y;
                 Velocity = 0f;
                 isOnFloor = true;
             }
-
             if (playerLeft <= 0)
+            {
                 pos.X = 0;
-
+            }
             if (playerRight >= 800)
+            {
                 pos.X = 800 - size.X;
-
+            }
             //Platform collision
             for (int i = 0; i < platforms.Length; i++)
             {
@@ -117,7 +117,29 @@ namespace MohawkGame2D
                 }
             }
             //hit box collision
+            for (int i = 0; i < hitBoxes.Length; i++)
+            {
+                HitBox hitBox = hitBoxes[i];
 
+                float hitBoxTop = hitBox.pos.Y;
+                float hitBoxBottom = hitBox.pos.Y + hitBox.size.Y;
+                float hitBoxLeft = hitBox.pos.X;
+                float hitBoxRight = hitBox.pos.X + hitBox.size.X;
+
+                bool isColliding = playerRight > hitBoxLeft && playerLeft < hitBoxRight && playerBottom > hitBoxTop && playerTop < hitBoxBottom;
+
+                if (isColliding)
+                {
+                    if (hitBox.bad == true)
+                    {
+                        pos = new Vector2(50, 50);
+                    }
+                    if (hitBox.bad == false)
+                    {
+                        Game.Win = true;
+                    }
+                }
+            }
         }
         public void Movement()
         {
